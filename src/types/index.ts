@@ -124,3 +124,6 @@ export interface AuditEvent {
   after_redacted?: any;
   created_at: string;
 }
+
+export * from './cms';
+

@@ -97,11 +97,10 @@ export const DonationsPage: React.FC = () => {
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold border ${
-                          item.status === 'captured'
+                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold border ${item.status === 'captured'
                             ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                             : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                        }`}>
+                          }`}>
                           {item.status}
                         </span>
                       </td>

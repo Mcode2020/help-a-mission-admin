@@ -244,6 +244,9 @@ export const adminApi = {
     }),
 
   // Media
+  getMediaAssets: (page = 1, limit = 30) =>
+    request<any>(`/admin/media?page=${page}&limit=${limit}`),
+
   uploadMedia: (file: File, visibility: 'public' | 'private' = 'public') => {
     const formData = new FormData();
     formData.append('file', file);

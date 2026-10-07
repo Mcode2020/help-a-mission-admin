@@ -59,10 +59,9 @@ export const Sidebar: React.FC = () => {
                 to={item.path}
                 end={item.path === '/'}
                 className={({ isActive }) =>
-                  `flex items-center gap-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-300 border border-emerald-500/30 shadow-md shadow-emerald-500/10'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  `flex items-center gap-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
+                    ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-300 border border-emerald-500/30 shadow-md shadow-emerald-500/10'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                   }`
                 }
               >
