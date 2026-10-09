@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Users, Plus, Trash2, Image as ImageIcon, Droplet, Activity, Sprout, Heart, Sparkles } from 'lucide-react';
 import type { CmsAboutSectionContent, CmsImpactCard } from '../../types';
 
 export type AboutMediaTarget = 'about' | { type: 'about_card'; index: number };
@@ -24,8 +24,6 @@ export const CmsAboutEditor: React.FC<CmsAboutEditorProps> = ({
     updatedCards[index] = { ...updatedCards[index], [field]: value };
     onChange({ ...content, impactCards: updatedCards });
   };
-
-
 
   const handleAddCard = () => {
     const newCard: CmsImpactCard = {
@@ -53,6 +51,24 @@ export const CmsAboutEditor: React.FC<CmsAboutEditorProps> = ({
         [field]: value,
       },
     });
+  };
+
+  const renderIconPreview = (iconName?: string) => {
+    switch (iconName) {
+      case 'Droplet':
+        return <Droplet className="w-4 h-4 text-teal-400" />;
+      case 'HeartPulse':
+      case 'Activity':
+        return <Activity className="w-4 h-4 text-red-400" />;
+      case 'Heart':
+        return <Heart className="w-4 h-4 text-pink-400" />;
+      case 'Users':
+        return <Users className="w-4 h-4 text-blue-400" />;
+      case 'Sprout':
+        return <Sprout className="w-4 h-4 text-emerald-400" />;
+      default:
+        return <Sparkles className="w-4 h-4 text-amber-400" />;
+    }
   };
 
   return (
@@ -197,17 +213,38 @@ export const CmsAboutEditor: React.FC<CmsAboutEditorProps> = ({
                 </button>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-medium text-slate-400 mb-1">Card Title</label>
-                <input
-                  type="text"
-                  value={card.title}
-                  onChange={(e) => handleUpdateCard(idx, 'title', e.target.value)}
-                  className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Card Title</label>
+                  <input
+                    type="text"
+                    value={card.title}
+                    onChange={(e) => handleUpdateCard(idx, 'title', e.target.value)}
+                    className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Card Icon (iconName)</label>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0">
+                      {renderIconPreview(card.iconName)}
+                    </div>
+                    <select
+                      value={card.iconName || 'Droplet'}
+                      onChange={(e) => handleUpdateCard(idx, 'iconName', e.target.value)}
+                      className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                    >
+                      <option value="Droplet">Droplet (Blood Donation Camps)</option>
+                      <option value="HeartPulse">HeartPulse (Health Awareness)</option>
+                      <option value="Users">Users (Support for Needy)</option>
+                      <option value="Sprout">Sprout (Community Development)</option>
+                      <option value="Heart">Heart (Medical Care)</option>
+                      <option value="Sparkles">Sparkles (General Initiative)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
-
-
 
               <div>
                 <label className="block text-[11px] font-medium text-slate-400 mb-1">Description</label>

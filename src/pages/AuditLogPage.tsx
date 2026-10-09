@@ -1,25 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Header } from '../components/layout/Header';
-import { adminApi } from '../services/api';
-import type { AuditEvent } from '../types';
+import { Loader2 } from 'lucide-react';
+import { useGetAuditLogsQuery } from '../features/users/usersApi';
 
 export const AuditLogPage: React.FC = () => {
-  const [logs, setLogs] = useState<AuditEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadAuditLogs = async () => {
-      try {
-        const data = await adminApi.getAuditLogs(1, 50);
-        setLogs(data.items || []);
-      } catch (err) {
-        console.error('Failed to load audit logs:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadAuditLogs();
-  }, []);
+  const { data: auditData, isLoading } = useGetAuditLogsQuery({ page: 1, limit: 50 });
+  const logs = auditData?.data || [];
 
   return (
     <div className="flex-1 min-w-0">
@@ -41,7 +27,12 @@ export const AuditLogPage: React.FC = () => {
               <tbody className="divide-y divide-slate-800/60">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading audit trail...</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                        <span>Loading audit trail...</span>
+                      </div>
+                    </td>
                   </tr>
                 ) : logs.length === 0 ? (
                   <tr>
@@ -59,7 +50,7 @@ export const AuditLogPage: React.FC = () => {
                       <td className="px-6 py-4 font-semibold text-slate-100">{log.action}</td>
                       <td className="px-6 py-4 text-slate-400 font-mono text-[11px]">{log.entity_type}</td>
                       <td className="px-6 py-4 text-slate-400 font-mono text-[11px]">
-                        {new Date(log.created_at).toLocaleString()}
+                        {log.created_at ? new Date(log.created_at).toLocaleString() : ''}
                       </td>
                     </tr>
                   ))

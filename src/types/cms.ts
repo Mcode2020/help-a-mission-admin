@@ -123,6 +123,10 @@ export interface CmsDonationSectionContent {
   suggestedAmountsINR: number[];
   defaultAmountINR: number;
   customAmountEnabled: boolean;
+  customAmountButtonLabel?: string;
+  customAmountInputLabel?: string;
+  customAmountPlaceholder?: string;
+  customAmountRequired?: boolean;
   minAmountINR?: number;
   maxAmountINR?: number;
   donateButtonLabel: string;
@@ -168,6 +172,6 @@ export interface CmsSectionPayload {
   sectionKey: CmsSectionKey;
   sectionType: string;
   sortOrder: number;
-  contentJson: any;
+  contentJson: Record<string, unknown> | unknown;
   status?: string;
 }

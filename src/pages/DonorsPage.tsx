@@ -1,32 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Header } from '../components/layout/Header';
-import { Search, Mail, Phone, UserCheck } from 'lucide-react';
-import { adminApi } from '../services/api';
+import { Search, Mail, Phone, UserCheck, Loader2 } from 'lucide-react';
+import { useGetDonorsQuery } from '../features/donations/donationsApi';
 import type { Donor } from '../types';
 
 export const DonorsPage: React.FC = () => {
-  const [donors, setDonors] = useState<Donor[]>([]);
   const [search, setSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: donorsData, isLoading } = useGetDonorsQuery({ page: 1, limit: 50 });
 
-  useEffect(() => {
-    const loadDonors = async () => {
-      try {
-        const data = await adminApi.getDonors(1, 50);
-        setDonors(data.data || []);
-      } catch (err) {
-        console.error('Failed to load donors:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadDonors();
-  }, []);
+  const donors: Donor[] = donorsData?.data || [];
 
   const filteredDonors = donors.filter(
     (d) =>
-      d.name.toLowerCase().includes(search.toLowerCase()) ||
-      d.email.toLowerCase().includes(search.toLowerCase())
+      d.name?.toLowerCase().includes(search.toLowerCase()) ||
+      d.email?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -68,7 +55,12 @@ export const DonorsPage: React.FC = () => {
               <tbody className="divide-y divide-slate-800/60">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading donor database...</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                        <span>Loading donor database...</span>
+                      </div>
+                    </td>
                   </tr>
                 ) : filteredDonors.length === 0 ? (
                   <tr>
@@ -103,7 +95,7 @@ export const DonorsPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-slate-400 font-mono text-[11px]">
-                        {new Date(donor.created_at).toLocaleDateString()}
+                        {donor.created_at ? new Date(donor.created_at).toLocaleDateString() : ''}
                       </td>
                     </tr>
                   ))

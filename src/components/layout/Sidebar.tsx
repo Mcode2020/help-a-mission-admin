@@ -14,9 +14,12 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useAppSelector } from '../../app/hooks';
+import { selectCurrentAdmin } from '../../features/auth/authSlice';
 
 export const Sidebar: React.FC = () => {
-  const { admin, logout, hasPermission } = useAuth();
+  const { logout, hasPermission } = useAuth();
+  const admin = useAppSelector(selectCurrentAdmin);
 
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/', permission: 'reports:read' },

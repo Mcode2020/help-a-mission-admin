@@ -57,14 +57,23 @@ export interface FinancialSummary {
   averageDonationMinor: number;
 }
 
+export * from '../constants/language';
+
 export interface CmsSection {
   id?: string;
   sectionKey: string;
   sectionType: string;
   sortOrder: number;
-  contentJson: any;
+  contentJson: Record<string, unknown> | unknown;
   status?: string;
   version?: number;
+  language?: string;
+}
+
+export interface SectionTranslationInfo {
+  en: 'complete' | 'incomplete' | 'missing';
+  hi: 'complete' | 'incomplete' | 'missing';
+  current: 'complete' | 'incomplete' | 'missing';
 }
 
 export interface CmsPageData {
@@ -72,7 +81,9 @@ export interface CmsPageData {
   slug: string;
   title: string;
   status: string;
+  language?: string;
   sections: CmsSection[];
+  translationStatus?: Record<string, SectionTranslationInfo>;
 }
 
 export interface Initiative {
@@ -120,10 +131,9 @@ export interface AuditEvent {
   action: string;
   entity_type: string;
   entity_id?: string;
-  before_redacted?: any;
-  after_redacted?: any;
+  before_redacted?: Record<string, unknown> | unknown;
+  after_redacted?: Record<string, unknown> | unknown;
   created_at: string;
 }
 
 export * from './cms';
-

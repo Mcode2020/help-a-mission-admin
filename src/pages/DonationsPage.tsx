@@ -1,27 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Header } from '../components/layout/Header';
-import { HeartHandshake, Search } from 'lucide-react';
-import { adminApi } from '../services/api';
+import { HeartHandshake, Search, Loader2 } from 'lucide-react';
+import { useGetDonationsQuery } from '../features/donations/donationsApi';
 import type { Donation } from '../types';
 
 export const DonationsPage: React.FC = () => {
-  const [donations, setDonations] = useState<Donation[]>([]);
   const [search, setSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: donationsData, isLoading } = useGetDonationsQuery({ page: 1, limit: 50 });
 
-  useEffect(() => {
-    const loadDonations = async () => {
-      try {
-        const data = await adminApi.getDonations(1, 50);
-        setDonations(data.data || []);
-      } catch (err) {
-        console.error('Failed to load donations:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadDonations();
-  }, []);
+  const donations: Donation[] = donationsData?.data || [];
 
   const formatRupees = (paise: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -75,7 +62,12 @@ export const DonationsPage: React.FC = () => {
               <tbody className="divide-y divide-slate-800/60">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading donation records...</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                        <span>Loading donation records...</span>
+                      </div>
+                    </td>
                   </tr>
                 ) : filteredDonations.length === 0 ? (
                   <tr>
@@ -105,7 +97,7 @@ export const DonationsPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-slate-400 font-mono text-[11px]">
-                        {new Date(item.created_at).toLocaleString()}
+                        {item.created_at ? new Date(item.created_at).toLocaleString() : ''}
                       </td>
                     </tr>
                   ))

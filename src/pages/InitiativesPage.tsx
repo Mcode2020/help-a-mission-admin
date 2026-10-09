@@ -1,48 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Header } from '../components/layout/Header';
-import { Plus } from 'lucide-react';
-import { adminApi } from '../services/api';
-import type { Initiative } from '../types';
+import { Plus, Loader2 } from 'lucide-react';
+import { useGetInitiativesQuery, useCreateInitiativeMutation } from '../features/campaigns/campaignsApi';
 
 export const InitiativesPage: React.FC = () => {
-  const [initiatives, setInitiatives] = useState<Initiative[]>([]);
+  const { data: initiatives = [], isLoading } = useGetInitiativesQuery();
+  const [createInitiative, { isLoading: isCreating }] = useCreateInitiativeMutation();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [summary, setSummary] = useState('');
   const [body, setBody] = useState('');
 
-  const loadData = async () => {
-    try {
-      const res = await adminApi.getInitiatives();
-      setInitiatives(res || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await adminApi.createInitiative({
+      await createInitiative({
         title,
         slug,
         summary,
         body,
         status: 'published',
-      });
+      }).unwrap();
       setIsModalOpen(false);
       setTitle('');
       setSlug('');
       setSummary('');
       setBody('');
-      loadData();
     } catch (err: any) {
-      alert(`Error creating initiative: ${err.message}`);
+      alert(`Error creating initiative: ${err.data?.message || err.message}`);
     }
   };
 
@@ -64,7 +51,12 @@ export const InitiativesPage: React.FC = () => {
 
         {/* Initiatives List Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {initiatives.length === 0 ? (
+          {isLoading ? (
+            <div className="col-span-full p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800 text-slate-400 text-xs flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              <span>Loading initiatives...</span>
+            </div>
+          ) : initiatives.length === 0 ? (
             <div className="col-span-full p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800 text-slate-500 text-xs">
               No initiatives found. Click 'New Initiative' to add one.
             </div>
@@ -141,9 +133,11 @@ export const InitiativesPage: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300"
+                    disabled={isCreating}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 flex items-center gap-1.5 disabled:opacity-50"
                   >
-                    Publish Initiative
+                    {isCreating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{isCreating ? 'Publishing...' : 'Publish Initiative'}</span>
                   </button>
                 </div>
               </form>

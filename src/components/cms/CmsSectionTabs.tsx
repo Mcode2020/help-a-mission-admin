@@ -1,6 +1,6 @@
 import React from 'react';
-import { Layout, Users, Sparkles, Image, HeartHandshake, Flag, SlidersHorizontal, ChevronRight } from 'lucide-react';
-import type { CmsSectionKey } from '../../types';
+import { Layout, Users, Sparkles, Image, HeartHandshake, Flag, SlidersHorizontal, ChevronRight, Check, AlertTriangle, X } from 'lucide-react';
+import type { CmsSectionKey, SectionTranslationInfo } from '../../types';
 import type { CmsPageSlug } from './CmsPageSelector';
 
 interface CmsSectionTabsProps {
@@ -8,13 +8,42 @@ interface CmsSectionTabsProps {
   activeTab: CmsSectionKey;
   onSelectTab: (key: CmsSectionKey) => void;
   orientation?: 'horizontal' | 'vertical';
+  translationStatus?: Record<string, SectionTranslationInfo>;
+  currentLanguage?: 'en' | 'hi';
 }
+
+const renderStatusBadge = (status?: 'complete' | 'incomplete' | 'missing', label?: string) => {
+  if (status === 'complete') {
+    return (
+      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+        <Check className="w-2.5 h-2.5" />
+        {label ? `${label}` : ''}
+      </span>
+    );
+  }
+  if (status === 'incomplete') {
+    return (
+      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+        <AlertTriangle className="w-2.5 h-2.5" />
+        {label ? `${label}` : ''}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-red-500/20 text-red-400 border border-red-500/30">
+      <X className="w-2.5 h-2.5" />
+      {label ? `${label}` : ''}
+    </span>
+  );
+};
 
 export const CmsSectionTabs: React.FC<CmsSectionTabsProps> = ({
   pageSlug,
   activeTab,
   onSelectTab,
   orientation = 'vertical',
+  translationStatus,
+  currentLanguage = 'en',
 }) => {
   const pageTabConfigs: Record<
     CmsPageSlug,
@@ -62,26 +91,25 @@ export const CmsSectionTabs: React.FC<CmsSectionTabsProps> = ({
         <div className="flex-1 flex items-center gap-1.5 p-1 bg-slate-900/90 border border-slate-800/80 rounded-xl overflow-x-auto scrollbar-none">
           {tabs.map((tab, idx) => {
             const isActive = activeTab === tab.key;
+            const statusInfo = translationStatus?.[tab.key];
+            const currentStatus = currentLanguage === 'hi' ? statusInfo?.hi : statusInfo?.en;
             return (
               <button
                 key={tab.key}
                 type="button"
                 onClick={() => onSelectTab(tab.key)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${isActive
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  isActive
                     ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
-                  }`}
+                }`}
               >
                 <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${isActive ? 'bg-slate-950/25 text-slate-950' : 'bg-slate-800 text-slate-400'}`}>
                   0{idx + 1}
                 </span>
                 {tab.icon}
                 <span>{tab.label}</span>
-                {tab.badge && (
-                  <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${isActive ? 'bg-slate-950/20 text-slate-950' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
-                    {tab.badge}
-                  </span>
-                )}
+                {renderStatusBadge(currentStatus, currentLanguage.toUpperCase())}
               </button>
             );
           })}
@@ -105,42 +133,39 @@ export const CmsSectionTabs: React.FC<CmsSectionTabsProps> = ({
       <div className="flex flex-col gap-1.5">
         {tabs.map((tab, idx) => {
           const isActive = activeTab === tab.key;
+          const statusInfo = translationStatus?.[tab.key];
           return (
             <button
               key={tab.key}
               type="button"
               onClick={() => onSelectTab(tab.key)}
-              className={`group relative flex items-center justify-between p-3 rounded-xl transition-all duration-200 text-left ${isActive
+              className={`group relative flex items-center justify-between p-3 rounded-xl transition-all duration-200 text-left ${
+                isActive
                   ? 'bg-slate-800/90 border border-emerald-500/50 shadow-md shadow-emerald-500/10 text-slate-100'
                   : 'bg-slate-950/40 hover:bg-slate-800/50 border border-slate-800/40 text-slate-400 hover:text-slate-200'
-                }`}
+              }`}
             >
-              {/* Active left indicator bar */}
               {isActive && (
                 <div className="absolute left-0 top-2 bottom-2 w-1 bg-emerald-400 rounded-r-full shadow-sm shadow-emerald-400/50" />
               )}
 
               <div className="flex items-center gap-3 min-w-0 pl-1">
                 <span
-                  className={`text-[10px] font-extrabold px-2 py-1 rounded-md shrink-0 transition-colors ${isActive
+                  className={`text-[10px] font-extrabold px-2 py-1 rounded-md shrink-0 transition-colors ${
+                    isActive
                       ? 'bg-emerald-400 text-slate-950'
                       : 'bg-slate-800/80 text-slate-400 group-hover:bg-slate-700 group-hover:text-slate-300'
-                    }`}
+                  }`}
                 >
                   0{idx + 1}
                 </span>
 
                 <div className="min-w-0 flex flex-col">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className={isActive ? 'text-emerald-400' : 'text-slate-400 group-hover:text-slate-300'}>
                       {tab.icon}
                     </span>
                     <span className="text-xs font-bold truncate">{tab.label}</span>
-                    {tab.badge && (
-                      <span className="px-1.5 py-0.5 text-[9px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">
-                        {tab.badge}
-                      </span>
-                    )}
                   </div>
                   <span className="text-[10px] text-slate-500 truncate mt-0.5 font-normal">
                     {tab.description}
@@ -148,12 +173,21 @@ export const CmsSectionTabs: React.FC<CmsSectionTabsProps> = ({
                 </div>
               </div>
 
-              <ChevronRight
-                className={`w-4 h-4 shrink-0 transition-transform duration-200 ${isActive
-                    ? 'text-emerald-400 translate-x-0.5'
-                    : 'text-slate-600 opacity-0 group-hover:opacity-100 group-hover:text-slate-400'
+              <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                {statusInfo && (
+                  <div className="flex items-center gap-1">
+                    {renderStatusBadge(statusInfo.en, 'EN')}
+                    {renderStatusBadge(statusInfo.hi, 'HI')}
+                  </div>
+                )}
+                <ChevronRight
+                  className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                    isActive
+                      ? 'text-emerald-400 translate-x-0.5'
+                      : 'text-slate-600 opacity-0 group-hover:opacity-100 group-hover:text-slate-400'
                   }`}
-              />
+                />
+              </div>
             </button>
           );
         })}

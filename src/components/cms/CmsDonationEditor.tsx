@@ -256,59 +256,149 @@ export const CmsDonationEditor: React.FC<CmsDonationEditorProps> = ({
           </div>
         </div>
 
-        {/* Preset Amounts Manager */}
-        <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800 space-y-3">
-          <label className="block text-xs font-semibold text-slate-300">Suggested Preset Amounts (INR ₹)</label>
-          <div className="flex flex-wrap gap-2 items-center">
-            {(content.suggestedAmountsINR || [500, 1000, 2000, 5000]).map((amt) => {
-              const isDefault = content.defaultAmountINR === amt;
-              return (
-                <div
-                  key={amt}
-                  className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${
-                    isDefault
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
-                      : 'bg-slate-900 text-slate-200 border-slate-800'
-                  }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => updateField('defaultAmountINR', amt)}
-                    className="flex items-center gap-1.5 text-left"
-                    title="Click to set as default selected amount"
-                  >
-                    {isDefault && <Check className="w-3.5 h-3.5 text-emerald-400" />}
-                    <span>₹{amt.toLocaleString('en-IN')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleRemovePresetAmount(amt)}
-                    className="text-slate-500 hover:text-red-400"
-                  >
-                    &times;
-                  </button>
-                </div>
-              );
-            })}
+        {/* Preset Amounts Manager & Custom Amount Toggle */}
+        <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800 space-y-4">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+            <div>
+              <p className="text-xs font-semibold text-slate-200">Custom Amount Option</p>
+              <p className="text-[11px] text-slate-400">Show &quot;Custom&quot; button on frontend so donors can enter any amount</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={content.customAmountEnabled !== false}
+                onChange={(e) => updateField('customAmountEnabled', e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+            </label>
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
-            <input
-              type="number"
-              placeholder="Add preset amount (e.g. 10000)"
-              value={newPresetVal}
-              onChange={(e) => setNewPresetVal(e.target.value)}
-              className="w-48 bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
-            />
-            <button
-              type="button"
-              onClick={handleAddPresetAmount}
-              className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition-all"
-            >
-              Add Preset
-            </button>
+          {content.customAmountEnabled !== false && (
+            <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-teal-300 mb-1">
+                  Custom Button Text / Label
+                </label>
+                <input
+                  type="text"
+                  value={content.customAmountButtonLabel || ''}
+                  onChange={(e) => updateField('customAmountButtonLabel', e.target.value)}
+                  placeholder="e.g. Custom or अपनी राशि"
+                  className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-teal-500/50"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">Button text shown on donation card preset options (Default: Custom)</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-slate-800/80 pt-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Field Label</label>
+                  <input
+                    type="text"
+                    value={content.customAmountInputLabel || ''}
+                    onChange={(e) => updateField('customAmountInputLabel', e.target.value)}
+                    placeholder="e.g. Enter Custom Amount (₹) or अपनी राशि दर्ज करें"
+                    className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-teal-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Input Type</label>
+                  <select
+                    disabled
+                    value="number"
+                    className="w-full bg-slate-950/60 text-slate-400 text-xs rounded-lg px-3 py-2 border border-slate-800/80 cursor-not-allowed"
+                  >
+                    <option value="number">number (Numeric Input)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Placeholder Text</label>
+                  <input
+                    type="text"
+                    value={content.customAmountPlaceholder || ''}
+                    onChange={(e) => updateField('customAmountPlaceholder', e.target.value)}
+                    placeholder="e.g. Enter amount in ₹ or ₹ दर्ज करें"
+                    className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-teal-500/50"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={content.customAmountRequired !== false}
+                    onChange={(e) => updateField('customAmountRequired', e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-slate-700 text-emerald-500 focus:ring-emerald-500/20 bg-slate-950 cursor-pointer"
+                  />
+                  <span>Mark as Required Field (<span className="text-red-400">*</span>)</span>
+                </label>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-2">Suggested Preset Amounts (INR ₹)</label>
+            <div className="flex flex-wrap gap-2 items-center">
+              {(content.suggestedAmountsINR || [500, 1000, 2000, 5000]).map((amt) => {
+                const isDefault = content.defaultAmountINR === amt;
+                return (
+                  <div
+                    key={amt}
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${
+                      isDefault
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
+                        : 'bg-slate-900 text-slate-200 border-slate-800'
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => updateField('defaultAmountINR', amt)}
+                      className="flex items-center gap-1.5 text-left"
+                      title="Click to set as default selected amount"
+                    >
+                      {isDefault && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                      <span>₹{amt.toLocaleString('en-IN')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePresetAmount(amt)}
+                      className="text-slate-500 hover:text-red-400"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                );
+              })}
+
+              {content.customAmountEnabled !== false && (
+                <div className="px-3 py-1.5 rounded-xl border border-teal-500/30 bg-teal-500/10 text-teal-300 text-xs font-bold flex items-center gap-1.5" title="Custom Amount button is active">
+                  <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+                  <span>{content.customAmountButtonLabel || 'Custom Amount'}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 pt-3">
+              <input
+                type="number"
+                placeholder="Add preset amount (e.g. 10000)"
+                value={newPresetVal}
+                onChange={(e) => setNewPresetVal(e.target.value)}
+                className="w-48 bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+              />
+              <button
+                type="button"
+                onClick={handleAddPresetAmount}
+                className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition-all"
+              >
+                Add Preset
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-400 pt-1">Click an amount chip to set it as the default selected amount on page load.</p>
           </div>
-          <p className="text-[11px] text-slate-400">Click an amount chip to set it as the default selected amount on page load.</p>
         </div>
 
         {/* Dynamic Form Fields Builder */}

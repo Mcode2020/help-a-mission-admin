@@ -113,22 +113,6 @@ export const CmsGalleryEditor: React.FC<CmsGalleryEditorProps> = ({
     }
   };
 
-  // Preset default photos from Figma mockup if list is empty
-  const handleLoadFigmaDefaults = () => {
-    const defaults: CmsGalleryItem[] = [
-      { id: 'fig_1', title: 'Welfare Cheque Distribution', url: '/src/assets/gallery-1.png', alt: 'Welfare Cheque Distribution' },
-      { id: 'fig_2', title: 'School Support Contribution', url: '/src/assets/gallery-2.png', alt: 'School Support Contribution' },
-      { id: 'fig_3', title: 'Community Aid Felicitation', url: '/src/assets/campaign_financial.png', alt: 'Community Aid Felicitation' },
-      { id: 'fig_4', title: 'Welfare Cheque Distribution', url: '/src/assets/gallery-1.png', alt: 'Welfare Cheque Distribution' },
-      { id: 'fig_5', title: 'School Support Contribution', url: '/src/assets/gallery-2.png', alt: 'School Support Contribution' },
-      { id: 'fig_6', title: 'Community Aid Felicitation', url: '/src/assets/campaign_financial.png', alt: 'Community Aid Felicitation' },
-      { id: 'fig_7', title: 'Welfare Cheque Distribution', url: '/src/assets/gallery-1.png', alt: 'Welfare Cheque Distribution' },
-      { id: 'fig_8', title: 'School Support Contribution', url: '/src/assets/gallery-2.png', alt: 'School Support Contribution' },
-      { id: 'fig_9', title: 'Community Aid Felicitation', url: '/src/assets/campaign_financial.png', alt: 'Community Aid Felicitation' },
-    ];
-    onChange({ ...content, images: defaults });
-  };
-
   return (
     <div className="bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-800 space-y-6">
       {/* Section Header */}
@@ -189,6 +173,17 @@ export const CmsGalleryEditor: React.FC<CmsGalleryEditorProps> = ({
         </div>
 
         <div>
+          <label className="block text-xs font-semibold text-slate-300 mb-2">Section Heading</label>
+          <input
+            type="text"
+            value={content.heading || ''}
+            onChange={(e) => updateField('heading', e.target.value)}
+            placeholder="Moments That Matter"
+            className="w-full bg-slate-950/80 text-slate-100 text-xs rounded-xl px-4 py-2.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+          />
+        </div>
+
+        <div>
           <label className="block text-xs font-semibold text-slate-300 mb-2">View All Gallery CTA Label</label>
           <input
             type="text"
@@ -199,13 +194,13 @@ export const CmsGalleryEditor: React.FC<CmsGalleryEditorProps> = ({
           />
         </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-xs font-semibold text-slate-300 mb-2">Section Heading</label>
+        <div>
+          <label className="block text-xs font-semibold text-slate-300 mb-2">View All Gallery CTA Target Link (URL)</label>
           <input
             type="text"
-            value={content.heading || ''}
-            onChange={(e) => updateField('heading', e.target.value)}
-            placeholder="Moments That Matter"
+            value={content.viewAllUrl || ''}
+            onChange={(e) => updateField('viewAllUrl', e.target.value)}
+            placeholder="/our-work"
             className="w-full bg-slate-950/80 text-slate-100 text-xs rounded-xl px-4 py-2.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
           />
         </div>
@@ -233,16 +228,6 @@ export const CmsGalleryEditor: React.FC<CmsGalleryEditorProps> = ({
               Photos uploaded here are displayed in the 3x3 layout on the homepage
             </p>
           </div>
-
-          {imagesList.length === 0 && (
-            <button
-              type="button"
-              onClick={handleLoadFigmaDefaults}
-              className="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold transition-all"
-            >
-              Load 9 Demo Figma Photos
-            </button>
-          )}
         </div>
 
         {imagesList.length === 0 ? (
@@ -262,13 +247,6 @@ export const CmsGalleryEditor: React.FC<CmsGalleryEditorProps> = ({
                 <span>Upload First Image</span>
                 <input type="file" accept="image/*" onChange={handleGlobalFileUpload} disabled={globalUploading} className="hidden" />
               </label>
-              <button
-                type="button"
-                onClick={handleLoadFigmaDefaults}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition-all"
-              >
-                Load Figma Defaults
-              </button>
             </div>
           </div>
         ) : (

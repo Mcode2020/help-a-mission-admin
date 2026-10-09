@@ -1,22 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Header } from '../components/layout/Header';
-import { adminApi } from '../services/api';
-import type { GalleryItem } from '../types';
+import { Loader2 } from 'lucide-react';
+import { useGetGalleryQuery } from '../features/gallery/galleryApi';
 
 export const GalleryPage: React.FC = () => {
-  const [items, setItems] = useState<GalleryItem[]>([]);
-
-  useEffect(() => {
-    const loadGallery = async () => {
-      try {
-        const res = await adminApi.getGallery();
-        setItems(res || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    loadGallery();
-  }, []);
+  const { data: items = [], isLoading } = useGetGalleryQuery();
 
   return (
     <div className="flex-1 min-w-0">
@@ -28,7 +16,12 @@ export const GalleryPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {items.length === 0 ? (
+          {isLoading ? (
+            <div className="col-span-full p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800 text-slate-400 text-xs flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              <span>Loading gallery...</span>
+            </div>
+          ) : items.length === 0 ? (
             <div className="col-span-full p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800 text-slate-500 text-xs">
               No gallery images found. Upload images in Media Library to attach.
             </div>

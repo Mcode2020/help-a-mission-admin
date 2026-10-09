@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 import { Header } from '../components/layout/Header';
-import { Receipt, Download, FileSpreadsheet, CheckCircle2 } from 'lucide-react';
-import { adminApi } from '../services/api';
+import { Receipt, Download, FileSpreadsheet, CheckCircle2, Loader2 } from 'lucide-react';
+import { useExportReportMutation } from '../features/donations/donationsApi';
 
 export const ReportsPage: React.FC = () => {
-  const [isExporting, setIsExporting] = useState(false);
+  const [exportReport, { isLoading: isExporting }] = useExportReportMutation();
   const [exportSuccess, setExportSuccess] = useState<string | null>(null);
 
   const handleExport = async (format: string) => {
-    setIsExporting(true);
     setExportSuccess(null);
     try {
-      const res = await adminApi.exportReport(format);
-      setExportSuccess(`Report generated successfully! Saved to private storage: ${res.relativePath}`);
+      const res = await exportReport({ format }).unwrap();
+      setExportSuccess(`Report generated successfully! ${res.filename ? `File: ${res.filename}` : ''}`);
     } catch (err: any) {
-      alert(`Export error: ${err.message}`);
-    } finally {
-      setIsExporting(false);
+      alert(`Export error: ${err.data?.message || err.message}`);
     }
   };
 
@@ -45,9 +42,9 @@ export const ReportsPage: React.FC = () => {
             <button
               disabled={isExporting}
               onClick={() => handleExport('csv')}
-              className="w-full py-3 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
+              {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               <span>{isExporting ? 'Generating...' : 'Generate Private CSV Export'}</span>
             </button>
           </div>
@@ -64,9 +61,9 @@ export const ReportsPage: React.FC = () => {
             <button
               disabled={isExporting}
               onClick={() => handleExport('pdf')}
-              className="w-full py-3 rounded-xl text-xs font-semibold text-slate-950 bg-teal-400 hover:bg-teal-300 shadow-lg shadow-teal-500/20 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl text-xs font-semibold text-slate-950 bg-teal-400 hover:bg-teal-300 shadow-lg shadow-teal-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
+              {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               <span>{isExporting ? 'Generating...' : 'Generate Private PDF Export'}</span>
             </button>
           </div>

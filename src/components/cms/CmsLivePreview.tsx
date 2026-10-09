@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Monitor,
   Heart,
@@ -6,6 +6,9 @@ import {
   GraduationCap,
   Sparkles,
   ArrowRight,
+  Droplet,
+  Activity,
+  Sprout,
 } from 'lucide-react';
 import gallery1 from '../../assets/gallery-1.png';
 import gallery2 from '../../assets/gallery-2.png';
@@ -40,9 +43,15 @@ export const CmsLivePreview: React.FC<CmsLivePreviewProps> = ({
   donation,
   missionCta,
 }) => {
-  const [selectedDonationPreset, setSelectedDonationPreset] = useState<number>(
+  const [selectedDonationPreset, setSelectedDonationPreset] = useState<number | 'custom'>(
     donation.defaultAmountINR || 1000
   );
+
+  useEffect(() => {
+    if (donation.defaultAmountINR) {
+      setSelectedDonationPreset(donation.defaultAmountINR);
+    }
+  }, [donation.defaultAmountINR]);
 
   const getBadgeIcon = (iconName: string) => {
     switch (iconName) {
@@ -54,6 +63,23 @@ export const CmsLivePreview: React.FC<CmsLivePreviewProps> = ({
         return <GraduationCap className="w-4 h-4 text-amber-500" />;
       default:
         return <Sparkles className="w-4 h-4 text-teal-500" />;
+    }
+  };
+
+  const renderCardIcon = (iconName?: string) => {
+    switch (iconName) {
+      case 'Droplet':
+        return <Droplet className="w-5 h-5 text-[#08A49C]" />;
+      case 'Heart':
+      case 'HeartPulse':
+      case 'Activity':
+        return <Activity className="w-5 h-5 text-[#08A49C]" />;
+      case 'Users':
+        return <Users className="w-5 h-5 text-[#08A49C]" />;
+      case 'Sprout':
+        return <Sprout className="w-5 h-5 text-[#08A49C]" />;
+      default:
+        return <Sparkles className="w-5 h-5 text-[#08A49C]" />;
     }
   };
 
@@ -180,12 +206,14 @@ export const CmsLivePreview: React.FC<CmsLivePreviewProps> = ({
               {about.impactCards && about.impactCards.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {about.impactCards.map((card, idx) => (
-                    <div key={card.id || idx} className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-center space-y-2">
-                      {card.mediaUrl && (
-                        <div className="w-10 h-10 mx-auto rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden">
-                          <img src={card.mediaUrl} alt={card.title} className="w-full h-full object-cover rounded-xl" />
-                        </div>
-                      )}
+                    <div key={card.id || idx} className="p-4 bg-[#F2F9F9] rounded-2xl border border-[#E1F2F1] shadow-sm text-center space-y-2 flex flex-col items-center justify-center">
+                      <div className="w-10 h-10 mx-auto rounded-xl bg-white flex items-center justify-center overflow-hidden border border-slate-100/80">
+                        {card.mediaUrl ? (
+                          <img src={card.mediaUrl} alt={card.title} className="w-full h-full object-cover" />
+                        ) : (
+                          renderCardIcon(card.iconName)
+                        )}
+                      </div>
                       <h4 className="text-xs font-bold text-slate-900">{card.title}</h4>
                       <p className="text-[11px] text-slate-500 line-clamp-2">{card.description}</p>
                     </div>
@@ -393,11 +421,33 @@ export const CmsLivePreview: React.FC<CmsLivePreviewProps> = ({
                     );
                   })}
                   {donation.customAmountEnabled !== false && (
-                    <button type="button" className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600">
-                      Custom
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDonationPreset('custom')}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                        selectedDonationPreset === 'custom'
+                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      {donation.customAmountButtonLabel || 'Custom'}
                     </button>
                   )}
                 </div>
+
+                {selectedDonationPreset === 'custom' && donation.customAmountEnabled !== false && (
+                  <div className="pt-1">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      {donation.customAmountInputLabel || 'Enter Custom Amount (₹)'} {donation.customAmountRequired !== false && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="number"
+                      disabled
+                      placeholder={donation.customAmountPlaceholder || 'Enter amount in ₹'}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-500 cursor-not-allowed"
+                    />
+                  </div>
+                )}
 
                 {/* Form Field Mockups (Driven dynamically by CMS fields) */}
                 <div className="space-y-3 pt-2">

@@ -1,6 +1,18 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import type { AdminUser } from '../types';
-import { adminApi } from '../services/api';
+import { useAppSelector } from '../app/hooks';
+import {
+  selectCurrentAdmin,
+  selectIsAuthenticated,
+  selectAuthLoading,
+  selectHasPermission,
+} from '../features/auth/authSlice';
+import {
+  useGetMeQuery,
+  useLoginMutation,
+  useLogoutMutation,
+  useRefreshSessionMutation,
+} from '../features/auth/authApi';
 
 interface AuthContextType {
   admin: AdminUser | null;
@@ -15,63 +27,49 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [admin, setAdmin] = useState<AdminUser | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const admin = useAppSelector(selectCurrentAdmin);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const isLoading = useAppSelector(selectAuthLoading);
 
-  const checkAuth = async () => {
-    try {
-      const data = await adminApi.getMe();
-      setAdmin(data.admin);
-    } catch {
-      setAdmin(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Trigger getMe query on mount to check existing session
+  const { isLoading: isFetchingMe } = useGetMeQuery(undefined, {
+    skip: false,
+  });
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const [loginMutation] = useLoginMutation();
+  const [logoutMutation] = useLogoutMutation();
+  const [refreshMutation] = useRefreshSessionMutation();
 
   const login = async (credentials: { email: string; password: string }) => {
-    const data = await adminApi.login(credentials);
-    setAdmin(data.admin);
+    await loginMutation(credentials).unwrap();
   };
 
   const logout = async () => {
     try {
-      await adminApi.logout();
-    } finally {
-      setAdmin(null);
+      await logoutMutation().unwrap();
+    } catch {
+      // Ignored - cleanup done in slice action
     }
   };
 
   const refreshSession = async () => {
-    try {
-      const data = await adminApi.refresh();
-      setAdmin(data.admin);
-    } catch {
-      setAdmin(null);
-    }
+    await refreshMutation().unwrap();
   };
 
-  const hasPermission = (permissionKey: string): boolean => {
-    if (!admin) return false;
-    if (admin.role === 'SUPER_ADMIN' || admin.role === 'Super Administrator') return true;
-    const perms = admin.permissions || [];
-    return perms.includes('access:all') || perms.includes('admin:all') || perms.includes(permissionKey);
+  const checkPermission = (permissionKey: string): boolean => {
+    return selectHasPermission({ auth: { admin, token: null, isAuthenticated, isLoading } } as any, permissionKey);
   };
 
   return (
     <AuthContext.Provider
       value={{
         admin,
-        isAuthenticated: !!admin,
-        isLoading,
+        isAuthenticated,
+        isLoading: isLoading || isFetchingMe,
         login,
         logout,
         refreshSession,
-        hasPermission,
+        hasPermission: checkPermission,
       }}
     >
       {children}
