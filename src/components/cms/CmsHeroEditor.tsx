@@ -6,12 +6,14 @@ interface CmsHeroEditorProps {
   content: CmsHeroSectionContent;
   onChange: (updated: CmsHeroSectionContent) => void;
   onOpenMediaPicker: () => void;
+  isMembersPage?: boolean;
 }
 
 export const CmsHeroEditor: React.FC<CmsHeroEditorProps> = ({
   content,
   onChange,
   onOpenMediaPicker,
+  isMembersPage = false,
 }) => {
   const updateField = (field: keyof CmsHeroSectionContent, value: any) => {
     onChange({ ...content, [field]: value });
@@ -79,92 +81,177 @@ export const CmsHeroEditor: React.FC<CmsHeroEditorProps> = ({
           />
         </div>
 
-        {/* Primary CTA */}
-        <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-3">
-          <h4 className="text-xs font-bold text-emerald-400">Primary CTA Button</h4>
-          <div>
-            <label className="block text-[11px] font-medium text-slate-400 mb-1">Button Label</label>
-            <input
-              type="text"
-              value={content.primaryCTA?.label || ''}
-              onChange={(e) => updatePrimaryCTA('label', e.target.value)}
-              placeholder="Contact Us"
-              className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] font-medium text-slate-400 mb-1">Target Link URL</label>
-            <input
-              type="text"
-              value={content.primaryCTA?.url || ''}
-              onChange={(e) => updatePrimaryCTA('url', e.target.value)}
-              placeholder="#contact"
-              className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
-            />
-          </div>
-        </div>
-
-        {/* Secondary CTA */}
-        <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-3">
-          <h4 className="text-xs font-bold text-teal-400">Secondary CTA Button</h4>
-          <div>
-            <label className="block text-[11px] font-medium text-slate-400 mb-1">Button Label</label>
-            <input
-              type="text"
-              value={content.secondaryCTA?.label || ''}
-              onChange={(e) => updateSecondaryCTA('label', e.target.value)}
-              placeholder="About Us"
-              className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] font-medium text-slate-400 mb-1">Target Link URL</label>
-            <input
-              type="text"
-              value={content.secondaryCTA?.url || ''}
-              onChange={(e) => updateSecondaryCTA('url', e.target.value)}
-              placeholder="#about"
-              className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
-            />
-          </div>
-        </div>
-
-        {/* Media Asset Picker Box */}
-        <div className="md:col-span-2 p-4 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {content.heroMediaUrl ? (
-              <img src={content.heroMediaUrl} alt="Hero Media" className="w-14 h-10 object-cover rounded-lg border border-slate-700" />
-            ) : (
-              <div className="w-14 h-10 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-500">
-                <ImageIcon className="w-5 h-5" />
+        {!isMembersPage && (
+          <>
+            {/* Primary CTA */}
+            <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-3">
+              <h4 className="text-xs font-bold text-emerald-400">Primary CTA Button</h4>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Button Label</label>
+                <input
+                  type="text"
+                  value={content.primaryCTA?.label || ''}
+                  onChange={(e) => updatePrimaryCTA('label', e.target.value)}
+                  placeholder="Contact Us"
+                  className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                />
               </div>
-            )}
-            <div>
-              <p className="text-xs font-semibold text-slate-200">Hero Banner Photo</p>
-              <p className="text-[11px] text-slate-400">
-                {content.heroMediaAssetId ? `Asset ID: ${content.heroMediaAssetId.slice(0, 12)}...` : 'No custom image selected (using default banner)'}
-              </p>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Target Link URL</label>
+                <input
+                  type="text"
+                  value={content.primaryCTA?.url || ''}
+                  onChange={(e) => updatePrimaryCTA('url', e.target.value)}
+                  placeholder="#contact"
+                  className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                />
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {content.heroMediaUrl && (
-              <button
-                type="button"
-                onClick={() => onChange({ ...content, heroMediaAssetId: '', heroMediaUrl: '' })}
-                className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-xl border border-red-500/20 transition-colors cursor-pointer"
-              >
-                Remove Photo
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onOpenMediaPicker}
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-md shadow-emerald-500/20"
-            >
-              {content.heroMediaUrl ? 'Change Photo' : 'Select Media Asset'}
-            </button>
-          </div>
-        </div>
+
+            {/* Secondary CTA */}
+            <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-3">
+              <h4 className="text-xs font-bold text-teal-400">Secondary CTA Button</h4>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Button Label</label>
+                <input
+                  type="text"
+                  value={content.secondaryCTA?.label || ''}
+                  onChange={(e) => updateSecondaryCTA('label', e.target.value)}
+                  placeholder="About Us"
+                  className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Target Link URL</label>
+                <input
+                  type="text"
+                  value={content.secondaryCTA?.url || ''}
+                  onChange={(e) => updateSecondaryCTA('url', e.target.value)}
+                  placeholder="#about"
+                  className="w-full bg-slate-900 text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                />
+              </div>
+            </div>
+
+            {/* Stat Cards Metrics Configuration */}
+            <div className="md:col-span-2 p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-4">
+              <h4 className="text-xs font-bold text-emerald-400">Stat Metrics Highlights</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Stat 1 */}
+                <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Stat #1</span>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Value (e.g. 5+)</label>
+                    <input
+                      type="text"
+                      value={content.stat1Value || ''}
+                      onChange={(e) => updateField('stat1Value', e.target.value)}
+                      placeholder="5+"
+                      className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Label</label>
+                    <input
+                      type="text"
+                      value={content.stat1Label || ''}
+                      onChange={(e) => updateField('stat1Label', e.target.value)}
+                      placeholder="Active Members"
+                      className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Stat 2 */}
+                <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Stat #2</span>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Value (e.g. 100%)</label>
+                    <input
+                      type="text"
+                      value={content.stat2Value || ''}
+                      onChange={(e) => updateField('stat2Value', e.target.value)}
+                      placeholder="100%"
+                      className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Label</label>
+                    <input
+                      type="text"
+                      value={content.stat2Label || ''}
+                      onChange={(e) => updateField('stat2Label', e.target.value)}
+                      placeholder="Voluntary Service"
+                      className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Stat 3 */}
+                <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Stat #3</span>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Value (e.g. 10+ Yrs)</label>
+                    <input
+                      type="text"
+                      value={content.stat3Value || ''}
+                      onChange={(e) => updateField('stat3Value', e.target.value)}
+                      placeholder="10+ Yrs"
+                      className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Label</label>
+                    <input
+                      type="text"
+                      value={content.stat3Label || ''}
+                      onChange={(e) => updateField('stat3Label', e.target.value)}
+                      placeholder="Years of Impact"
+                      className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Media Asset Picker Box */}
+            <div className="md:col-span-2 p-4 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {content.heroMediaUrl ? (
+                  <img src={content.heroMediaUrl} alt="Hero Media" className="w-14 h-10 object-cover rounded-lg border border-slate-700" />
+                ) : (
+                  <div className="w-14 h-10 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-500">
+                    <ImageIcon className="w-5 h-5" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs font-semibold text-slate-200">Hero Banner Photo</p>
+                  <p className="text-[11px] text-slate-400">
+                    {content.heroMediaAssetId ? `Asset ID: ${content.heroMediaAssetId.slice(0, 12)}...` : 'No custom image selected (using default banner)'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {content.heroMediaUrl && (
+                  <button
+                    type="button"
+                    onClick={() => onChange({ ...content, heroMediaAssetId: '', heroMediaUrl: '' })}
+                    className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-xl border border-red-500/20 transition-colors cursor-pointer"
+                  >
+                    Remove Photo
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onOpenMediaPicker}
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-md shadow-emerald-500/20"
+                >
+                  {content.heroMediaUrl ? 'Change Photo' : 'Select Media Asset'}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

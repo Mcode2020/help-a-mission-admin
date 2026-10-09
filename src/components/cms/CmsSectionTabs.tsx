@@ -77,6 +77,11 @@ export const CmsSectionTabs: React.FC<CmsSectionTabsProps> = ({
       { key: 'about', label: 'Contact Details', description: 'Address & info', icon: <Users className="w-4 h-4" /> },
       { key: 'mission_cta', label: 'Connect CTA', description: 'Inquiry banner', icon: <Flag className="w-4 h-4" /> },
     ],
+    members: [
+      { key: 'hero', label: 'Members Banner', description: 'Hero headline, badge & stats', icon: <Layout className="w-4 h-4" /> },
+      { key: 'about', label: 'Members Directory', description: 'Add, edit & delete members', icon: <Users className="w-4 h-4" /> },
+      { key: 'mission_cta', label: 'Join CTA Banner', description: 'Call to action banner & buttons', icon: <Flag className="w-4 h-4" /> },
+    ],
   };
 
   const tabs = pageTabConfigs[pageSlug] || pageTabConfigs.home;

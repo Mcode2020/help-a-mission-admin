@@ -286,4 +286,50 @@ export const adminApi = {
   // Audit Logs
   getAuditLogs: (page = 1, limit = 20) =>
     request<any>(`/admin/audit?page=${page}&limit=${limit}`),
+
+  // Members
+  getMembers: (page = 1, limit = 50, search = '', language?: string) =>
+    request<any>(`/admin/members?page=${page}&limit=${limit}${search ? `&search=${encodeURIComponent(search)}` : ''}${language ? `&language=${language}` : ''}`),
+
+  getMemberById: (id: string) =>
+    request<any>(`/admin/members/${id}`),
+
+  createMember: (data: {
+    name: string;
+    email?: string;
+    phone?: string;
+    title: string;
+    description?: string;
+    image_url?: string;
+    status?: 'published' | 'draft';
+    language?: 'en' | 'hi';
+    sort_order?: number;
+  }) =>
+    request<any>('/admin/members', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateMember: (id: string, data: Partial<{
+    name: string;
+    email: string;
+    phone: string;
+    title: string;
+    description: string;
+    image_url: string;
+    status: 'published' | 'draft';
+    language: 'en' | 'hi';
+    sort_order: number;
+  }>) =>
+    request<any>(`/admin/members/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  deleteMember: (id: string) =>
+    request<any>(`/admin/members/${id}`, {
+      method: 'DELETE',
+    }),
+
 };
+

@@ -34,6 +34,7 @@ export const Sidebar: React.FC = () => {
     { label: 'Audit Logs', icon: ShieldAlert, path: '/audit', permission: 'security:read' },
   ];
 
+
   return (
     <aside className="w-64 bg-slate-900/90 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between h-screen sticky top-0 z-30">
       <div>

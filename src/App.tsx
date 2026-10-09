@@ -14,6 +14,7 @@ import { MediaPage } from './pages/MediaPage';
 import { RbacPage } from './pages/RbacPage';
 import { AuditLogPage } from './pages/AuditLogPage';
 
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode; permission?: string }> = ({
   children,
   permission,
@@ -99,6 +100,7 @@ export function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="members" element={<Navigate to="/cms" replace />} />
             <Route
               path="gallery"
               element={
@@ -107,6 +109,7 @@ export function App() {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="media"
               element={

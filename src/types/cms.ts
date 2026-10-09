@@ -14,6 +14,12 @@ export interface CmsHeroSectionContent {
   heroMediaAssetId?: string;
   heroMediaUrl?: string;
   heroImageAlt?: string;
+  stat1Value?: string;
+  stat1Label?: string;
+  stat2Value?: string;
+  stat2Label?: string;
+  stat3Value?: string;
+  stat3Label?: string;
 }
 
 export interface CmsImpactCard {
@@ -138,11 +144,13 @@ export interface CmsDonationSectionContent {
 }
 
 export interface CmsMissionCTASectionContent {
-  eyebrow: string;
-  heading: string;
-  subheading: string;
-  ctaLabel: string;
-  ctaUrl: string;
+  eyebrow?: string;
+  heading?: string;
+  subheading?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaUrl?: string;
   bannerMediaAssetId?: string;
   bannerMediaUrl?: string;
   bannerMediaAspectRatio?: string;

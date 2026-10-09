@@ -1,7 +1,7 @@
 import React from 'react';
-import { Home, Info, Sparkles, HeartHandshake, Mail, Layers } from 'lucide-react';
+import { Home, Info, Sparkles, HeartHandshake, Mail, Layers, UserCheck } from 'lucide-react';
 
-export type CmsPageSlug = 'home' | 'about' | 'our-work' | 'campaigns' | 'contact';
+export type CmsPageSlug = 'home' | 'about' | 'our-work' | 'campaigns' | 'members' | 'contact';
 
 interface CmsPageSelectorProps {
   activePage: CmsPageSlug;
@@ -14,6 +14,7 @@ export const CmsPageSelector: React.FC<CmsPageSelectorProps> = ({ activePage, on
     { slug: 'about', label: 'About Us', icon: <Info className="w-3.5 h-3.5" />, isReady: false },
     { slug: 'our-work', label: 'Our Work', icon: <Sparkles className="w-3.5 h-3.5" />, isReady: false },
     { slug: 'campaigns', label: 'Campaigns', icon: <HeartHandshake className="w-3.5 h-3.5" />, isReady: false },
+    { slug: 'members', label: 'Members', icon: <UserCheck className="w-3.5 h-3.5" />, isReady: true },
     { slug: 'contact', label: 'Contact', icon: <Mail className="w-3.5 h-3.5" />, isReady: false },
   ];
 

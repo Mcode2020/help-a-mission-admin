@@ -37,7 +37,9 @@ import { CmsDonationEditor } from '../components/cms/CmsDonationEditor';
 import { CmsMissionCTAEditor } from '../components/cms/CmsMissionCTAEditor';
 import { CmsSEOEditor } from '../components/cms/CmsSEOEditor';
 import { MediaPickerModal } from '../components/cms/MediaPickerModal';
+import { MembersPage } from './MembersPage';
 import type { CmsSection } from '../types';
+
 
 export const CmsPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -390,9 +392,10 @@ export const CmsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Main Workspace (Sidebar + Form Editor) */}
-      {activePage !== 'home' ? (
+      {/* Main Workspace (Sidebar + Form Editor or Members Management) */}
+      {activePage !== 'home' && activePage !== 'members' ? (
         <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+
           <div className="max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4 shadow-2xl">
             <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl font-bold">
               !
@@ -402,7 +405,7 @@ export const CmsPage: React.FC = () => {
                 {activePage.replace('-', ' ')} Page Data Pending
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Currently, only the <strong className="text-emerald-400">Home Page</strong> dataset and sections are available in the CMS. The sections for <strong>{activePage.replace('-', ' ')}</strong> will be displayed here once their backend API data is published.
+                Currently, section data is available for <strong className="text-emerald-400">Home Page</strong> and <strong className="text-emerald-400">Members Page</strong>. The sections for <strong>{activePage.replace('-', ' ')}</strong> will be displayed here once their backend API data is published.
               </p>
             </div>
             <button
@@ -435,15 +438,20 @@ export const CmsPage: React.FC = () => {
                 content={drafts.hero}
                 onChange={(val) => dispatch(setHeroDraft(val))}
                 onOpenMediaPicker={() => handleOpenMediaPicker('hero')}
+                isMembersPage={activePage === 'members'}
               />
             )}
 
             {activeTab === 'about' && (
-              <CmsAboutEditor
-                content={drafts.about}
-                onChange={(val) => dispatch(setAboutDraft(val))}
-                onOpenMediaPicker={(target) => handleOpenMediaPicker(target || 'about')}
-              />
+              activePage === 'members' ? (
+                <MembersPage hideHeader={true} currentLanguage={language} />
+              ) : (
+                <CmsAboutEditor
+                  content={drafts.about}
+                  onChange={(val) => dispatch(setAboutDraft(val))}
+                  onOpenMediaPicker={(target) => handleOpenMediaPicker(target || 'about')}
+                />
+              )
             )}
 
             {activeTab === 'initiatives' && (
@@ -475,6 +483,7 @@ export const CmsPage: React.FC = () => {
                 content={drafts.missionCta}
                 onChange={(val) => dispatch(setMissionCtaDraft(val))}
                 onOpenMediaPicker={() => handleOpenMediaPicker('mission_cta')}
+                isMembersPage={activePage === 'members'}
               />
             )}
 
