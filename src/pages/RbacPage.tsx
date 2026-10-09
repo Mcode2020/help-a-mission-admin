@@ -1,60 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Header } from '../components/layout/Header';
-import { Plus, KeyRound } from 'lucide-react';
-import { adminApi } from '../services/api';
-import type { Role, Permission } from '../types';
+import { Plus, KeyRound, Loader2 } from 'lucide-react';
+import { useGetRolesQuery, useGetPermissionsQuery, useCreateRoleMutation } from '../features/users/usersApi';
 
 export const RbacPage: React.FC = () => {
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const { data: rolesData, isLoading: isLoadingRoles } = useGetRolesQuery();
+  const { data: permsData, isLoading: isLoadingPerms } = useGetPermissionsQuery();
+  const [createRole, { isLoading: isCreatingRole }] = useCreateRoleMutation();
+
+  const roles = rolesData?.roles || [];
+  const permissions = permsData?.permissions || [];
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [key, setKey] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedPerms, setSelectedPerms] = useState<string[]>([]);
 
-  const loadData = async () => {
-    try {
-      const [rolesData, permsData] = await Promise.all([
-        adminApi.getRoles(),
-        adminApi.getPermissions(),
-      ]);
-      setRoles(rolesData.roles || []);
-      setPermissions(permsData.permissions || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const handleCreateRole = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await adminApi.createRole({
+      await createRole({
         key,
         name,
         description,
-        permissionKeys: selectedPerms,
-      });
+        permissionIds: selectedPerms,
+      }).unwrap();
       setIsModalOpen(false);
       setKey('');
       setName('');
       setDescription('');
       setSelectedPerms([]);
-      loadData();
     } catch (err: any) {
-      alert(`Error creating role: ${err.message}`);
+      alert(`Error creating role: ${err.data?.message || err.message}`);
     }
   };
 
-  const togglePerm = (permKey: string) => {
-    if (selectedPerms.includes(permKey)) {
-      setSelectedPerms(selectedPerms.filter((p) => p !== permKey));
+  const togglePerm = (permId: string) => {
+    if (selectedPerms.includes(permId)) {
+      setSelectedPerms(selectedPerms.filter((p) => p !== permId));
     } else {
-      setSelectedPerms([...selectedPerms, permKey]);
+      setSelectedPerms([...selectedPerms, permId]);
     }
   };
 
@@ -76,20 +62,27 @@ export const RbacPage: React.FC = () => {
 
         {/* Roles List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {roles.map((role) => (
-            <div key={role.id} className="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-emerald-400 font-semibold">{role.key}</span>
-                {role.is_system && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    System Role
-                  </span>
-                )}
-              </div>
-              <h3 className="text-base font-bold text-slate-100">{role.name}</h3>
-              <p className="text-xs text-slate-400">{role.description}</p>
+          {isLoadingRoles ? (
+            <div className="col-span-full p-8 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              <span>Loading roles...</span>
             </div>
-          ))}
+          ) : (
+            roles.map((role) => (
+              <div key={role.id} className="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-emerald-400 font-semibold">{role.key}</span>
+                  {role.is_system && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      System Role
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-base font-bold text-slate-100">{role.name}</h3>
+                <p className="text-xs text-slate-400">{role.description}</p>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Permissions Registry */}
@@ -98,14 +91,21 @@ export const RbacPage: React.FC = () => {
             <KeyRound className="w-5 h-5 text-emerald-400" />
             <h3 className="text-base font-bold text-slate-100">Authoritative Permission Registry</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {permissions.map((perm) => (
-              <div key={perm.id} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-1">
-                <div className="font-mono font-semibold text-emerald-400">{perm.key}</div>
-                <div className="text-[11px] text-slate-400">{perm.description}</div>
-              </div>
-            ))}
-          </div>
+          {isLoadingPerms ? (
+            <div className="p-8 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              <span>Loading permissions...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {permissions.map((perm) => (
+                <div key={perm.id} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-1">
+                  <div className="font-mono font-semibold text-emerald-400">{perm.key}</div>
+                  <div className="text-[11px] text-slate-400">{perm.description}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Modal */}
@@ -150,11 +150,11 @@ export const RbacPage: React.FC = () => {
                   <label className="block text-xs font-semibold text-slate-300 mb-2">Assign Permissions</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto p-2 bg-slate-950 rounded-xl border border-slate-800">
                     {permissions.map((p) => (
-                      <label key={p.key} className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                      <label key={p.id} className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={selectedPerms.includes(p.key)}
-                          onChange={() => togglePerm(p.key)}
+                          checked={selectedPerms.includes(p.id)}
+                          onChange={() => togglePerm(p.id)}
                           className="rounded border-slate-800 text-emerald-500 focus:ring-emerald-500/20"
                         />
                         <span className="font-mono text-emerald-400">{p.key}</span>
@@ -172,9 +172,11 @@ export const RbacPage: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300"
+                    disabled={isCreatingRole}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 flex items-center gap-1.5 disabled:opacity-50"
                   >
-                    Save Role
+                    {isCreatingRole && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{isCreatingRole ? 'Saving...' : 'Save Role'}</span>
                   </button>
                 </div>
               </form>

@@ -1,5 +1,7 @@
 import React from 'react';
 import { ShieldCheck, Bell, Search, Activity } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectSearchQuery, setSearchQuery } from '../../features/ui/uiSlice';
 
 interface HeaderProps {
   title: string;
@@ -7,6 +9,9 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
+  const dispatch = useAppDispatch();
+  const searchQuery = useAppSelector(selectSearchQuery);
+
   return (
     <header className="bg-slate-900/60 backdrop-blur-md border-b border-slate-800/80 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
       <div>
@@ -26,6 +31,8 @@ export const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => dispatch(setSearchQuery(e.target.value))}
             placeholder="Search transactions, donors, CMS..."
             className="w-64 bg-slate-950/60 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 border border-slate-800 focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-slate-500"
           />
